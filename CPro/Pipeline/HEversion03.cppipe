@@ -1,0 +1,798 @@
+CellProfiler Pipeline: http://www.cellprofiler.org
+Version:5
+DateRevision:424
+GitHash:
+ModuleCount:46
+HasImagePlaneDetails:False
+
+Images:[module_num:1|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['To begin creating your project, use the Images module to compile a list of files and/or folders that you want to analyze. You can also specify a set of rules to include only the desired files in your selected folders.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    :
+    Filter images?:Images only
+    Select the rule criteria:and (extension does isimage) (directory doesnot containregexp "[\\/]\.")
+
+Metadata:[module_num:2|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:['The Metadata module optionally allows you to extract information describing your images (i.e, metadata) which will be stored along with your measurements. This information can be contained in the file name and/or location, or in an external file.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Extract metadata?:No
+    Metadata data type:Text
+    Metadata types:{}
+    Extraction method count:2
+    Metadata extraction method:Extract from file/folder names
+    Metadata source:File name
+    Regular expression to extract from file name:^(?P<ExperimentName>.*)_(?P<Well>[A-Za-z][0-9]{1,2})f(?P<Field>[0-9]{1,2})d(?P<Wavelength>[0-9])
+    Regular expression to extract from folder name:(?P<Date>[0-9]{4}_[0-9]{2}_[0-9]{2})$
+    Extract metadata from:All images
+    Select the filtering criteria:and (file does contain "")
+    Metadata file location:Elsewhere...|
+    Match file and image metadata:[]
+    Use case insensitive matching?:No
+    Metadata file name:
+    Does cached metadata exist?:No
+    Metadata extraction method:Import from file
+    Metadata source:File name
+    Regular expression to extract from file name:^(?P<Plate>.*)_(?P<Well>[A-P][0-9]{2})_s(?P<Site>[0-9])_w(?P<ChannelNumber>[0-9])
+    Regular expression to extract from folder name:(?P<Date>[0-9]{4}_[0-9]{2}_[0-9]{2})$
+    Extract metadata from:All images
+    Select the filtering criteria:and (file does contain "")
+    Metadata file location:Elsewhere...|D:\EVOSdata\AscInflam01\CProA
+    Match file and image metadata:[{'Image Metadata': 'Well', 'CSV Metadata': 'Well'}]
+    Use case insensitive matching?:No
+    Metadata file name:Metadata.csv
+    Does cached metadata exist?:No
+
+NamesAndTypes:[module_num:3|svn_version:'Unknown'|variable_revision_number:8|show_window:False|notes:['The NamesAndTypes module allows you to assign a meaningful name to each image by which other modules will refer to it.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Assign a name to:Images matching rules
+    Select the image type:Grayscale image
+    Name to assign these images:DNA
+    Match metadata:[]
+    Image set matching method:Order
+    Set intensity range from:Image metadata
+    Assignments count:3
+    Single images count:0
+    Maximum intensity:255.0
+    Process as 3D?:No
+    Relative pixel spacing in X:1.0
+    Relative pixel spacing in Y:1.0
+    Relative pixel spacing in Z:1.0
+    Select the rule criteria:and (file does contain "d0")
+    Name to assign these images:NucleiProb
+    Name to assign these objects:Cell
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (file does contain "d1")
+    Name to assign these images:ChromatinProb
+    Name to assign these objects:Nucleus
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+    Select the rule criteria:and (file does contain "d4")
+    Name to assign these images:HE
+    Name to assign these objects:Cytoplasm
+    Select the image type:Color image
+    Set intensity range from:Image metadata
+    Maximum intensity:255.0
+
+Groups:[module_num:4|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['The Groups module optionally allows you to split your list of images into image subsets (groups) which will be processed independently of each other. Examples of groupings include screening batches, microtiter plates, time-lapse movies, etc.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Do you want to group your images?:No
+    grouping metadata count:1
+    Metadata category:Well
+
+ColorToGray:[module_num:5|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:HE
+    Conversion method:Combine
+    Image type:RGB
+    Name the output image:HEGray
+    Relative weight of the red channel:1.0
+    Relative weight of the green channel:1.0
+    Relative weight of the blue channel:1.0
+    Convert red to gray?:Yes
+    Name the output image:OrigRed
+    Convert green to gray?:Yes
+    Name the output image:OrigGreen
+    Convert blue to gray?:Yes
+    Name the output image:OrigBlue
+    Convert hue to gray?:Yes
+    Name the output image:OrigHue
+    Convert saturation to gray?:Yes
+    Name the output image:OrigSaturation
+    Convert value to gray?:Yes
+    Name the output image:OrigValue
+    Channel count:1
+    Channel number:1
+    Relative weight of the channel:1.0
+    Image name:Channel1
+
+UnmixColors:[module_num:6|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['Nucleoli associated chromatin often stains stronger', 'Threfore we will use this empirical approach to isolate small areas staining strongly with hematoxilin', 'At this step we start by getting th ehematoxilin layer by unmixing']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Stain count:1
+    Select the input color image:HE
+    Name the output image:Hematoxylin
+    Stain:Hematoxylin
+    Red absorbance:0.5
+    Green absorbance:0.5
+    Blue absorbance:0.5
+
+GaussianFilter:[module_num:7|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['Here starts an empirical approach that will end up in objects representing potential nucleoli (nucleoli-associated chromatin and stained with hemaotoxilin)', 'Here we strongly blurr the hematoxilin layer from unmixing for further use in substraction', 'Strong blurring is to minimize the amount substracted in the next steps', '']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:HEGray
+    Name the output image:GaussianFilter
+    Sigma:5
+
+ImageMath:[module_num:8|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['We first substract the blurred image to the hematoxilin layer']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Operation:Subtract
+    Raise the power of the result by:1.0
+    Multiply the result by:1.0
+    Add to result:0.0
+    Set values less than 0 equal to 0?:Yes
+    Set values greater than 1 equal to 1?:Yes
+    Replace invalid values with 0?:Yes
+    Ignore the image masks?:No
+    Name the output image:Gauss1
+    Image or measurement?:Image
+    Select the first image:Hematoxylin
+    Multiply the first image by:1.0
+    Measurement:
+    Image or measurement?:Image
+    Select the second image:GaussianFilter
+    Multiply the second image by:1.0
+    Measurement:
+
+ImageMath:[module_num:9|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['We substract again as in an interative step (2nd substraction)']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Operation:Subtract
+    Raise the power of the result by:1.0
+    Multiply the result by:1.0
+    Add to result:0.0
+    Set values less than 0 equal to 0?:Yes
+    Set values greater than 1 equal to 1?:Yes
+    Replace invalid values with 0?:Yes
+    Ignore the image masks?:No
+    Name the output image:Gauss2
+    Image or measurement?:Image
+    Select the first image:Gauss1
+    Multiply the first image by:1.0
+    Measurement:
+    Image or measurement?:Image
+    Select the second image:GaussianFilter
+    Multiply the second image by:1.0
+    Measurement:
+
+ImageMath:[module_num:10|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['We substract again (3rd substraction) to the hematoxilin layer']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Operation:Subtract
+    Raise the power of the result by:1.0
+    Multiply the result by:1.0
+    Add to result:0.0
+    Set values less than 0 equal to 0?:Yes
+    Set values greater than 1 equal to 1?:Yes
+    Replace invalid values with 0?:Yes
+    Ignore the image masks?:No
+    Name the output image:Gauss3
+    Image or measurement?:Image
+    Select the first image:Gauss2
+    Multiply the first image by:1.0
+    Measurement:
+    Image or measurement?:Image
+    Select the second image:GaussianFilter
+    Multiply the second image by:1.0
+    Measurement:
+
+IdentifyPrimaryObjects:[module_num:11|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:['After the three iterative gauss substration form hematoxilin layer, we get the candidate nucleoli objects using conventional segmentation (IdentifyPrimaryObjects)']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:Gauss3
+    Name the primary objects to be identified:Nucelolos
+    Typical diameter of objects, in pixel units (Min,Max):5,25
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Shape
+    Method to draw dividing lines between clumped objects:Shape
+    Size of smoothing filter:10
+    Suppress local maxima that are closer than this minimum allowed distance:10
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:After both thresholding and declumping
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:No
+    Handling of objects if excessive number of objects identified:Continue
+    Maximum number of objects:500
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Minimum Cross-Entropy
+    Threshold smoothing scale:0
+    Threshold correction factor:1
+    Lower and upper bounds on threshold:0.1,1.0
+    Manual threshold:0.35
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:50
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Median
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+IdentifyPrimaryObjects:[module_num:12|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:['Here we get the nuclei objects from the layer of nuclei probability obtained with Ilastic']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:NucleiProb
+    Name the primary objects to be identified:NucObjects
+    Typical diameter of objects, in pixel units (Min,Max):30,60
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Shape
+    Method to draw dividing lines between clumped objects:Shape
+    Size of smoothing filter:10
+    Suppress local maxima that are closer than this minimum allowed distance:10
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:After both thresholding and declumping
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:No
+    Handling of objects if excessive number of objects identified:Continue
+    Maximum number of objects:500
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Minimum Cross-Entropy
+    Threshold smoothing scale:0
+    Threshold correction factor:1
+    Lower and upper bounds on threshold:0.001,1.0
+    Manual threshold:0.35
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:50
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Median
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+IdentifySecondaryObjects:[module_num:13|svn_version:'Unknown'|variable_revision_number:10|show_window:False|notes:['The cell objects are defined arbitarily as secondary objects by extension of nuclei objects']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:NucObjects
+    Name the objects to be identified:CellObjects
+    Select the method to identify the secondary objects:Distance - N
+    Select the input image:HEGray
+    Number of pixels by which to expand the primary objects:14
+    Regularization factor:0.05
+    Discard secondary objects touching the border of the image?:No
+    Discard the associated primary objects?:No
+    Name the new primary objects:FilteredNuclei
+    Fill holes in identified objects?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Minimum Cross-Entropy
+    Threshold smoothing scale:1.348
+    Threshold correction factor:1.0
+    Lower and upper bounds on threshold:0.0,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:50
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Minimum Cross-Entropy
+
+IdentifyTertiaryObjects:[module_num:14|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['The cytoplasm is defined as a terciary object resulting from the substraction of nucleus from the cell object']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the larger identified objects:CellObjects
+    Select the smaller identified objects:NucObjects
+    Name the tertiary objects to be identified:Cytoplasm
+    Shrink smaller object prior to subtraction?:Yes
+
+ConvertObjectsToImage:[module_num:15|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['An image created for visual control showing segmented cells']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:CellObjects
+    Name the output image:Cells_Colour
+    Select the color format:Color
+    Select the colormap:Default
+
+ConvertObjectsToImage:[module_num:16|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['An image created for visual control showing segmented nuclei']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:NucObjects
+    Name the output image:Nuc_Colour
+    Select the color format:Color
+    Select the colormap:Reds_r
+
+ConvertObjectsToImage:[module_num:17|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['An  image created for visual control showing cytoplasms']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:Cytoplasm
+    Name the output image:Cytoplasm_Colour
+    Select the color format:Color
+    Select the colormap:Greens
+
+ExpandOrShrinkObjects:[module_num:18|svn_version:'Unknown'|variable_revision_number:2|show_window:False|notes:['The cell object is shrunked for creating a visual effect of cell contour (images for visual control purposes)']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:CellObjects
+    Name the output objects:ShrunkenCell
+    Select the operation:Shrink objects by a specified number of pixels
+    Number of pixels by which to expand or shrink:2
+    Fill holes in objects so that all objects shrink to a single point?:No
+    Expand or shrink measurement:None
+
+IdentifyPrimaryObjects:[module_num:19|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:['Segmentation of chromatin objects from the chromatin probability image (obtained with Ilastic)']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:ChromatinProb
+    Name the primary objects to be identified:ASCspecs
+    Typical diameter of objects, in pixel units (Min,Max):10,60
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Shape
+    Method to draw dividing lines between clumped objects:Shape
+    Size of smoothing filter:20
+    Suppress local maxima that are closer than this minimum allowed distance:20
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:Never
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:No
+    Handling of objects if excessive number of objects identified:Continue
+    Maximum number of objects:500
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Minimum Cross-Entropy
+    Threshold smoothing scale:0
+    Threshold correction factor:1
+    Lower and upper bounds on threshold:0.65,1.0
+    Manual threshold:0.35
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:50
+    Lower outlier fraction:0.15
+    Upper outlier fraction:0.35
+    Averaging method:Median
+    Variance method:Standard deviation
+    # of deviations:6
+    Thresholding method:Otsu
+
+ImageMath:[module_num:20|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['The inverse of chromatin will be used to get parachromatin']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Operation:Invert
+    Raise the power of the result by:1.0
+    Multiply the result by:1.0
+    Add to result:0.0
+    Set values less than 0 equal to 0?:Yes
+    Set values greater than 1 equal to 1?:Yes
+    Replace invalid values with 0?:Yes
+    Ignore the image masks?:No
+    Name the output image:ParachromatinProb
+    Image or measurement?:Image
+    Select the first image:ChromatinProb
+    Multiply the first image by:1.0
+    Measurement:
+    Image or measurement?:Image
+    Select the second image:None
+    Multiply the second image by:1.0
+    Measurement:
+
+IdentifyPrimaryObjects:[module_num:21|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:['This intermediate object will be used for getting actual parachromatin with a masking over the nucleus in a next step']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input image:ParachromatinProb
+    Name the primary objects to be identified:ParachromOBJ
+    Typical diameter of objects, in pixel units (Min,Max):10,60000
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Shape
+    Method to draw dividing lines between clumped objects:Shape
+    Size of smoothing filter:20
+    Suppress local maxima that are closer than this minimum allowed distance:20
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:Never
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:No
+    Handling of objects if excessive number of objects identified:Continue
+    Maximum number of objects:500
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Manual
+    Threshold smoothing scale:0
+    Threshold correction factor:1
+    Lower and upper bounds on threshold:0.65,1.0
+    Manual threshold:0.97
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:50
+    Lower outlier fraction:0.15
+    Upper outlier fraction:0.35
+    Averaging method:Median
+    Variance method:Standard deviation
+    # of deviations:6
+    Thresholding method:Otsu
+
+MaskObjects:[module_num:22|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Here the actual parachromatin objects are obtained (MaskePCH)']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select objects to be masked:ParachromOBJ
+    Name the masked objects:MaskedPCH
+    Mask using a region defined by other objects or by binary image?:Objects
+    Select the masking object:NucObjects
+    Select the masking image:None
+    Handling of objects that are partially masked:Keep overlapping region
+    Fraction of object that must overlap:0.5
+    Numbering of resulting objects:Renumber
+    Invert the mask?:No
+
+ConvertObjectsToImage:[module_num:23|svn_version:'Unknown'|variable_revision_number:1|show_window:False|notes:['An image of masked PCH objects']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the input objects:MaskedPCH
+    Name the output image:MaskedPCH_image
+    Select the color format:Color
+    Select the colormap:Default
+
+MeasureObjectSizeShape:[module_num:24|svn_version:'Unknown'|variable_revision_number:3|show_window:False|notes:['Objects are measured for size and shape without a need for an image (they are just objects)']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select object sets to measure:ASCspecs, CellObjects, Cytoplasm, NucObjects, Nucelolos
+    Calculate the Zernike features?:No
+    Calculate the advanced features?:No
+
+MeasureObjectIntensity:[module_num:25|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Intensity is measured for all objects refering to grey HE image ']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:HEGray
+    Select objects to measure:ASCspecs, Cytoplasm, NucObjects, Nucelolos
+
+MeasureTexture:[module_num:26|svn_version:'Unknown'|variable_revision_number:7|show_window:False|notes:['Texture is measured for all objects refering to grey HE image ']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:HEGray
+    Select objects to measure:ASCspecs, Cytoplasm, NucObjects, Nucelolos
+    Enter how many gray levels to measure the texture at:256
+    Hidden:1
+    Measure whole images or objects?:Objects
+    Texture scale to measure:3
+
+MeasureGranularity:[module_num:27|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['Granularity is measured for all objects refering to grey HE image ']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:HEGray
+    Measure within objects?:Yes
+    Select objects to measure:ASCspecs, Cytoplasm, NucObjects, Nucelolos
+    Subsampling factor for granularity measurements:0.25
+    Subsampling factor for background reduction:0.25
+    Radius of structuring element:10
+    Range of the granular spectrum:16
+
+ClassifyObjects:[module_num:28|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['This classification aims to get "chromatin" objects probably associated to nucleolus using area and roundness as a classification criteria (a form factor above 0.75)']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Make classification decision based on:Single measurement
+    Hidden:1
+    Hidden:1
+    Select the object to be classified:ASCspecs
+    Select the measurement to classify by:AreaShape_FormFactor
+    Select bin spacing:Evenly spaced bins
+    Number of bins:1
+    Lower threshold:0.75
+    Use a bin for objects below the threshold?:Yes
+    Upper threshold:1.0
+    Use a bin for objects above the threshold?:No
+    Enter the custom thresholds separating the values between bins:0,1
+    Give each bin a name?:Yes
+    Enter the bin names separated by commas:Cromatina,Nucleolo
+    Retain an image of the classified objects?:Yes
+    Name the output image:ClassifiedASCspecs
+    Select a class:None
+    Name the output objects:ClassifiedObjects
+    Select the object name:CellObjects
+    Select the first measurement:Intensity_MaxIntensity_ASCGrey
+    Method to select the cutoff:Mean
+    Enter the cutoff value:0.5
+    Select the second measurement:Intensity_MaxIntensityEdge_ASCGrey
+    Method to select the cutoff:Mean
+    Enter the cutoff value:0.5
+    Use custom names for the bins?:No
+    Enter the low-low bin name:low_low
+    Enter the low-high bin name:low_high
+    Enter the high-low bin name:high_low
+    Enter the high-high bin name:high_high
+    Retain an image of the classified objects?:Yes
+    Enter the image name:None
+    Save classes as new object sets?:No
+    Select the location of the classifier model file:Default Output Folder|None
+    Rules or classifier file name:None
+    Allow fuzzy feature matching?:No
+
+OverlayOutlines:[module_num:29|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['We overlay the outlines of cells on the HE gray image for visual control']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:HEGray
+    Name the output image:OrigOverlay
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Inner
+    Select outline color:Red
+    Select objects to display:CellObjects
+
+OverlayOutlines:[module_num:30|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['We overlay outlines of the possible nucleolus-associated chromatin (objects) to the HE grey image']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:HEGray
+    Name the output image:OverlayNucleolos
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Inner
+    Select outline color:Red
+    Select objects to display:Nucelolos
+
+OverlayOutlines:[module_num:31|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['We overlay the outlines of chromatin to the HE grey image']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:HEGray
+    Name the output image:OverlayCromatina
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Inner
+    Select outline color:green
+    Select objects to display:ASCspecs
+
+OverlayOutlines:[module_num:32|svn_version:'Unknown'|variable_revision_number:4|show_window:False|notes:['We overlay the outlines of the nuclear parachromatin objects (representing potential areas of parachromatin)', '']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:HEGray
+    Name the output image:OverlayPARACromatina
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Inner
+    Select outline color:green
+    Select objects to display:MaskedPCH
+
+ImageMath:[module_num:33|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Another image for visual control with outlines of segmented cells with their nuclei']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Operation:Add
+    Raise the power of the result by:1.0
+    Multiply the result by:1.0
+    Add to result:0.0
+    Set values less than 0 equal to 0?:Yes
+    Set values greater than 1 equal to 1?:Yes
+    Replace invalid values with 0?:Yes
+    Ignore the image masks?:No
+    Name the output image:CellconNucleos
+    Image or measurement?:Image
+    Select the first image:OrigOverlay
+    Multiply the first image by:1.0
+    Measurement:
+    Image or measurement?:Image
+    Select the second image:Nuc_Colour
+    Multiply the second image by:1.0
+    Measurement:
+
+RelateObjects:[module_num:34|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Create the relationship between cell object and dependent object for getting average object measurements per cell in the database', 'Nuclei']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Parent objects:CellObjects
+    Child objects:NucObjects
+    Calculate child-parent distances?:None
+    Calculate per-parent means for all child measurements?:No
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:RelateObjects
+    Parent name:None
+
+RelateObjects:[module_num:35|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Create the relationship between cell object and dependent object for getting average object measurements per cell in the database', 'Chromatin objects']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Parent objects:CellObjects
+    Child objects:ASCspecs
+    Calculate child-parent distances?:Centroid
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:Rel_NucleoCromatina
+    Parent name:None
+
+RelateObjects:[module_num:36|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Create the relationship between cell object and dependent object for getting average object measurements per cell in the database', 'Parachromatin objects']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Parent objects:CellObjects
+    Child objects:MaskedPCH
+    Calculate child-parent distances?:Centroid
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:Rel_NucleoCromatina
+    Parent name:None
+
+RelateObjects:[module_num:37|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['Create the relationship between cell object and dependent object for getting average object measurements per cell in the database', 'Nucleolus object (chromatin probably associated to nucleolus)']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Parent objects:CellObjects
+    Child objects:Nucelolos
+    Calculate child-parent distances?:Centroid
+    Calculate per-parent means for all child measurements?:Yes
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:Rel_NucleoCromatina
+    Parent name:None
+
+SaveImages:[module_num:38|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:['Save image for visual control', 'Nucleoli outlines (chromatin probably associated to nucleoli)']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:OverlayNucleolos
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:HE
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:Yes
+    Text to append to the image name:nucleolo
+    Saved file format:jpeg
+    Output file location:Default Output Folder|
+    Image bit depth:8-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...|
+    How to save the series:T (Time)
+    Save with lossless compression?:No
+
+SaveImages:[module_num:39|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:['Save image for visual control', 'Outlines of chromatin objects']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:OverlayCromatina
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:HE
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:Yes
+    Text to append to the image name:cromatina
+    Saved file format:jpeg
+    Output file location:Default Output Folder|
+    Image bit depth:8-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...|
+    How to save the series:T (Time)
+    Save with lossless compression?:No
+
+SaveImages:[module_num:40|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:['Save image for visual control', 'Parachromatin objects']|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:OverlayPARACromatina
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:HE
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:Yes
+    Text to append to the image name:PARAcromatina
+    Saved file format:jpeg
+    Output file location:Default Output Folder|
+    Image bit depth:8-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...|
+    How to save the series:T (Time)
+    Save with lossless compression?:No
+
+SaveImages:[module_num:41|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:['Save image for visual control', 'cell outlines with nucleoli outlines']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:CellconNucleos
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:HE
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:Yes
+    Text to append to the image name:cell_nuc
+    Saved file format:jpeg
+    Output file location:Default Output Folder|
+    Image bit depth:8-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...|
+    How to save the series:T (Time)
+    Save with lossless compression?:No
+
+SaveImages:[module_num:42|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:['Save image for visual control', 'classification image for visual control with regular chromatin objects and chromatin objects that may represent nucleolus-associated chromatin']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:ClassifiedASCspecs
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:HE
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:Yes
+    Text to append to the image name:Classify
+    Saved file format:jpeg
+    Output file location:Default Output Folder|
+    Image bit depth:8-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...|
+    How to save the series:T (Time)
+    Save with lossless compression?:No
+
+SaveImages:[module_num:43|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:['Save image for visual control', 'Cell objects image for visual control']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:Cells_Colour
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:NucleiProb
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:CellMask
+    Saved file format:jpeg
+    Output file location:Default Output Folder|
+    Image bit depth:8-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...|
+    How to save the series:T (Time)
+    Save with lossless compression?:No
+
+SaveImages:[module_num:44|svn_version:'Unknown'|variable_revision_number:16|show_window:False|notes:['Save image for visual control', 'Cytoplasm image (object) for visual control']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:Cytoplasm_Colour
+    Select method for constructing file names:From image filename
+    Select image name for file prefix:ChromatinProb
+    Enter single file name:OrigBlue
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:CellMask
+    Saved file format:jpeg
+    Output file location:Default Output Folder|
+    Image bit depth:8-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...|
+    How to save the series:T (Time)
+    Save with lossless compression?:No
+
+ExportToSpreadsheet:[module_num:45|svn_version:'Unknown'|variable_revision_number:13|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the column delimiter:Comma (",")
+    Add image metadata columns to your object data file?:No
+    Add image file and folder names to your object data file?:No
+    Select the measurements to export:Yes
+    Calculate the per-image mean values for object measurements?:No
+    Calculate the per-image median values for object measurements?:No
+    Calculate the per-image standard deviation values for object measurements?:No
+    Output file location:Default Output Folder|
+    Create a GenePattern GCT file?:No
+    Select source of sample row name:Metadata
+    Select the image to use as the identifier:None
+    Select the metadata to use as the identifier:None
+    Export all measurement types?:Yes
+    Press button to select measurements:CellObjects|Number_Object_Number,CellObjects|Location_Center_Y,CellObjects|Location_Center_X,CellObjects|Location_Center_Z,CellObjects|AreaShape_Center_Y,CellObjects|AreaShape_Center_X,CellObjects|AreaShape_Center_Z,CellObjects|AreaShape_Area,RelateObjects|AreaShape_Perimeter,RelateObjects|AreaShape_FormFactor,RelateObjects|AreaShape_Solidity,RelateObjects|AreaShape_Center_Y,RelateObjects|AreaShape_Center_X,RelateObjects|AreaShape_Center_Z,RelateObjects|AreaShape_Area,RelateObjects|AreaShape_MinFeretDiameter,RelateObjects|AreaShape_MaxFeretDiameter,RelateObjects|AreaShape_EulerNumber,RelateObjects|AreaShape_MedianRadius,RelateObjects|AreaShape_Compactness,RelateObjects|AreaShape_Extent,RelateObjects|AreaShape_Orientation,RelateObjects|AreaShape_Eccentricity,RelateObjects|AreaShape_MaximumRadius,RelateObjects|AreaShape_MinorAxisLength,RelateObjects|AreaShape_MajorAxisLength,RelateObjects|AreaShape_MeanRadius,Mito_dots_in_cell|Parent_CellObjects,Mito_dots_in_cell|Number_Object_Number,Mito_dots_in_cell|Intensity_IntegratedIntensity_MaskDots,Mito_dots_in_cell|AreaShape_Perimeter,Mito_dots_in_cell|AreaShape_Area,Mito_dots_in_cell|AreaShape_MedianRadius,Mito_dots_in_cell|AreaShape_MaximumRadius,Mito_dots_in_cell|AreaShape_MinorAxisLength,Mito_dots_in_cell|AreaShape_MajorAxisLength,Mito_dots_in_cell|AreaShape_MeanRadius
+    Representation of Nan/Inf:NaN
+    Add a prefix to file names?:No
+    Filename prefix:MyExpt_
+    Overwrite existing files without warning?:Yes
+
+ExportToDatabase:[module_num:46|svn_version:'Unknown'|variable_revision_number:28|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Database type:SQLite
+    Database name:DefaultDB
+    Add a prefix to table names?:Yes
+    Table prefix:ASC_
+    Output file location:Default Output Folder|
+    Create a CellProfiler Analyst properties file?:Yes
+    Database host:
+    Username:
+    Password:
+    Name the SQLite database file:ASC_classDB.db
+    Calculate the per-image mean values of object measurements?:No
+    Calculate the per-image median values of object measurements?:No
+    Calculate the per-image standard deviation values of object measurements?:No
+    Calculate the per-well mean values of object measurements?:No
+    Calculate the per-well median values of object measurements?:No
+    Calculate the per-well standard deviation values of object measurements?:No
+    Export measurements for all objects to the database?:Select...
+    Select the objects:CellObjects,Cytoplasm,NucObjects
+    Maximum # of characters in a column name:64
+    Create one table per object, a single object table or a single object view?:Single object table
+    Enter an image url prepend if you plan to access your files via http:
+    Write image thumbnails directly to the database?:Yes
+    Select the images for which you want to save thumbnails:HE
+    Auto-scale thumbnail pixel intensities?:Yes
+    Select the plate type:None
+    Select the plate metadata:None
+    Select the well metadata:None
+    Include information for all images, using default values?:Yes
+    Properties image group count:1
+    Properties group field count:1
+    Properties filter field count:0
+    Workspace measurement count:1
+    Experiment name:ASC_specs
+    Which objects should be used for locations?:CellObjects
+    Enter a phenotype class table name if using the Classifier tool in CellProfiler Analyst:ASC_dot
+    Export object relationships?:Yes
+    Overwrite without warning?:Never
+    Access CellProfiler Analyst images via URL?:Yes
+    Select the classification type:Object
+    Select an image to include:None
+    Use the image name for the display?:Yes
+    Image name:Channel1
+    Channel color:red
+    Do you want to add group fields?:No
+    Enter the name of the group:Treatment
+    Enter the per-image columns which define the group, separated by commas:ImageNumber, Image_Metadata_Well
+    Do you want to add filter fields?:No
+    Automatically create a filter for each plate?:No
+    Create a CellProfiler Analyst workspace file?:No
+    Select the measurement display tool:ScatterPlot
+    Type of measurement to plot on the X-axis:Image
+    Enter the object name:None
+    Select the X-axis measurement:None
+    Select the X-axis index:ImageNumber
+    Type of measurement to plot on the Y-axis:Image
+    Enter the object name:None
+    Select the Y-axis measurement:None
+    Select the Y-axis index:ImageNumber
