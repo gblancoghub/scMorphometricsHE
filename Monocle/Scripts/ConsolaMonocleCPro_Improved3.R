@@ -1,6 +1,7 @@
 
-
-
+# A basic script for building trajectories for each patient
+# with plotting and exploring effects of selection of initital clusters
+# There is also an intersting box plot of clusters all along trajectories
 
 library(monocle3)
 library(SeuratWrappers)
@@ -12,7 +13,7 @@ library(tidyverse)
 
 
 # Restore the object
-# El que tiene ya los clusters generado en carpeta ScType
+# 
 
 # DEL11q.integrated <- readRDS(file = "merged_seurat_integrated.rds")
   DEL11q.integrated <- readRDS(file = "seurat_integrated.rds")
@@ -23,8 +24,7 @@ DEL11q.integrated@meta.data$seurat_clusters
 DEL11q.integrated@meta.data$RNA_snn_res.0.1 
 
 
-
-# DEL11q.integrated <- subset(DEL11q.integrated, subset = (tissue=="LN"))
+# Process pateints one by one by subsetting
 
 # DEL11q.integrated <- subset(DEL11q.integrated, subset = (Patient == "PAC02"))
 
@@ -42,12 +42,8 @@ cds <- as.cell_data_set(DEL11q.integrated)
 colData(cds)
 rownames(colData(cds)) # los barcodes
 colnames(colData(cds))
-> colnames(colData(cds))
- [1] "orig.ident"      "nCount_RNA"      "nFeature_RNA"    "RNA_snn_res.0.1"
- [5] "RNA_snn_res.0.3" "RNA_snn_res.0.5" "RNA_snn_res.0.7" "RNA_snn_res.1"  
- [9] "seurat_clusters" "num1"            "num2"            "Patient"        
-[13] "Barcode"         "ident"          
->
+
+
 dff <- colData(cds)
 
 fData(cds) #metadata
@@ -120,8 +116,6 @@ cds@int_colData@listData$reducedDims$UMAP <- DEL11q.integrated@reductions$umap@c
 
 # PLOTEO CON MONOCLE
 
-# plot  -plot_cells parece de Monocle3
-# ACA EL COLOR ES POR EL SEURAT CLUSTER
 
 cluster.before.trajectory <- plot_cells(cds,
            color_cells_by = 'seurat_clusters',
@@ -130,15 +124,6 @@ cluster.before.trajectory <- plot_cells(cds,
   theme(legend.position = "right")
 
 
-# ACA EL COLOR ES POR EL CUSTOM CLASSIFICATION
-cluster.names <- plot_cells(cds,
-           color_cells_by = "seurat_clusters",
-           label_groups_by_cluster = FALSE,
-           group_label_size = 5) +
-  scale_color_manual(values = c('red', 'blue', 'green', 'maroon', 'yellow', 'grey', 'cyan','black','pink','orange','magenta')) +
-  theme(legend.position = "right")
-
-cluster.before.trajectory | cluster.names
 
 # ...3. Learn trajectory graph ------------------------
 cds <- learn_graph(cds, use_partition = FALSE)

@@ -1,4 +1,7 @@
-
+# A simplified code for building and plotting  trjacetories for each patients
+# Includes options to customize plotting of trajectories and dots representing cells (transparency)
+# Includes reporting nummber of roots (expansion appears relevant to a-CLL cases)
+# may be linked to genomic instability
 
 set.seed(1234)
 
@@ -33,7 +36,7 @@ DEL11q.integrated <- backup
 
  DEL11q.integrated <- subset(DEL11q.integrated, subset = (Patient == "00_PAC01"))
 
- DEL11q.integrated <- subset(DEL11q.integrated, subset = (Patient == "02_PAC03"))
+#  DEL11q.integrated <- subset(DEL11q.integrated, subset = (Patient == "02_PAC03"))
 #
 # DEL11q.integrated <- subset(DEL11q.integrated, subset = (Patient == "04_PAC04"))
 
